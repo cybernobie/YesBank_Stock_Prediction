@@ -50,6 +50,7 @@ The dataset contains monthly stock prices of Yes Bank since its inception and in
    streamlit run app.py
    ```
    Live At : https://yesbankstockprediction.streamlit.app/
+   
    *The app can also be easily hosted on the Streamlit Community Cloud using the provided `requirements.txt` file.*
 
 ## 📈 Key Conclusions
