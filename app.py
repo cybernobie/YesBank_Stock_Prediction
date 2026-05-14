@@ -7,14 +7,21 @@ st.set_page_config(page_title="Yes Bank Stock Predictor", page_icon="📈", layo
 st.title("📈 Yes Bank Monthly Close Price Predictor")
 st.write("This app predicts the monthly closing stock price for Yes Bank based on the Open, High, and Low prices for that month.")
 
+from sklearn.preprocessing import StandardScaler
+
 @st.cache_resource
-def load_model():
-    return joblib.load('best_model_rf.pkl')
+def load_model_and_scaler():
+    model = joblib.load('best_model_rf.pkl')
+    # The Random Forest was trained on scaled data, so we must recreate the scaler
+    df = pd.read_csv('data_YesBank_StockPrices.csv')
+    scaler = StandardScaler()
+    scaler.fit(df[['Open', 'High', 'Low']])
+    return model, scaler
 
 try:
-    model = load_model()
+    model, scaler = load_model_and_scaler()
 except Exception as e:
-    st.error(f"Error loading the model: {e}")
+    st.error(f"Error loading the model or data: {e}")
     st.stop()
 
 st.sidebar.header("Input Features")
@@ -37,7 +44,9 @@ if st.sidebar.button("Predict Close Price"):
     })
     
     with st.spinner("Predicting..."):
-        prediction = model.predict(input_df)[0]
+        # Transform inputs using the fitted scaler
+        input_scaled = scaler.transform(input_df)
+        prediction = model.predict(input_scaled)[0]
     
     st.success(f"### Predicted Close Price: ₹{prediction:.2f}")
     
